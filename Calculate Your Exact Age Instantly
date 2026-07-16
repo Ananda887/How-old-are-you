@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How old are you, exactly? — Age Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#12141c;
+    --bg-soft:#1b1e29;
+    --bg-softer:#232735;
+    --accent:#e8b368;
+    --accent-dim:#7a6440;
+    --dial:#4fa391;
+    --text:#f1eee6;
+    --text-muted:#8b93a7;
+    --line:rgba(241,238,230,0.08);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:760px;
+    margin:0 auto;
+    padding:6vh 24px 10vh;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--dial);
+    margin:0 0 18px;
+  }
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:clamp(34px,6vw,58px);
+    line-height:1.05;
+    letter-spacing:-0.01em;
+    margin:0 0 14px;
+  }
+  h1 em{
+    font-style:italic;
+    font-weight:300;
+    color:var(--accent);
+  }
+  .sub{
+    font-size:16px;
+    color:var(--text-muted);
+    max-width:46ch;
+    line-height:1.6;
+    margin:0 0 40px;
+  }
+  .card{
+    background:var(--bg-soft);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:28px;
+  }
+  .fields{
+    display:flex;
+    gap:16px;
+    flex-wrap:wrap;
+    margin-bottom:8px;
+  }
+  .field{
+    flex:1;
+    min-width:180px;
+  }
+  label{
+    display:block;
+    font-size:12px;
+    font-family:'IBM Plex Mono',monospace;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--text-muted);
+    margin-bottom:8px;
+  }
+  input[type="date"], input[type="time"]{
+    width:100%;
+    background:var(--bg-softer);
+    border:1px solid var(--line);
+    border-radius:10px;
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    font-size:15px;
+    padding:12px 14px;
+    outline:none;
+    color-scheme:dark;
+  }
+  input:focus{
+    border-color:var(--accent-dim);
+    box-shadow:0 0 0 3px rgba(232,179,104,0.12);
+  }
+
+  .result{
+    display:none;
+    margin-top:48px;
+  }
+  .stat-row{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:0;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    padding:32px 0;
+    margin-bottom:28px;
+  }
+  .stat{
+    text-align:center;
+    border-left:1px solid var(--line);
+  }
+  .stat:first-child{border-left:none;}
+  .stat .num{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:clamp(32px,7vw,54px);
+    line-height:1;
+    color:var(--accent);
+  }
+  .stat .lbl{
+    margin-top:8px;
+    font-size:12px;
+    font-family:'IBM Plex Mono',monospace;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--text-muted);
+  }
+
+  .ticker{
+    text-align:center;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:14px;
+    color:var(--text-muted);
+    margin-bottom:40px;
+  }
+  .ticker span{color:var(--text);}
+
+  .ring-row{
+    display:flex;
+    align-items:center;
+    gap:28px;
+    flex-wrap:wrap;
+  }
+  .ring-row .copy{flex:1; min-width:200px;}
+  .ring-row h3{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:19px;
+    margin:0 0 6px;
+  }
+  .ring-row p{
+    font-size:14px;
+    color:var(--text-muted);
+    line-height:1.6;
+    margin:0;
+  }
+  .ring-row p span{color:var(--dial); font-weight:500;}
+
+  svg{display:block; flex-shrink:0;}
+
+  .hint{
+    color:var(--text-muted);
+    font-size:14px;
+    margin-top:20px;
+  }
+
+  footer{
+    margin-top:56px;
+    font-size:12px;
+    color:var(--text-muted);
+    font-family:'IBM Plex Mono',monospace;
+    letter-spacing:0.04em;
+  }
+
+  @media (max-width:520px){
+    .stat-row{grid-template-columns:1fr; gap:20px;}
+    .stat{border-left:none; border-top:1px solid var(--line); padding-top:20px;}
+    .stat:first-child{border-top:none; padding-top:0;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Exact age calculator</p>
+  <h1>How old are you,<br><em>exactly?</em></h1>
+  <p class="sub">Not just the number on your last cake. Enter your birth date below and watch the seconds add up in real time.</p>
+
+  <div class="card">
+    <div class="fields">
+      <div class="field">
+        <label for="dob">Date of birth</label>
+        <input type="date" id="dob">
+      </div>
+      <div class="field">
+        <label for="tob">Time of birth (optional)</label>
+        <input type="time" id="tob">
+      </div>
+    </div>
+    <p class="hint" id="hint">Enter your date of birth to begin.</p>
+
+    <div class="result" id="result">
+      <div class="stat-row">
+        <div class="stat">
+          <div class="num" id="out-years">–</div>
+          <div class="lbl">Years</div>
+        </div>
+        <div class="stat">
+          <div class="num" id="out-months">–</div>
+          <div class="lbl">Months</div>
+        </div>
+        <div class="stat">
+          <div class="num" id="out-days">–</div>
+          <div class="lbl">Days</div>
+        </div>
+      </div>
+
+      <p class="ticker">You've been alive for <span id="out-totaldays">–</span> days —<br>that's <span id="out-totalsecs">–</span> seconds and counting.</p>
+
+      <div class="ring-row">
+        <svg width="96" height="96" viewBox="0 0 96 96">
+          <circle cx="48" cy="48" r="42" fill="none" stroke="rgba(241,238,230,0.08)" stroke-width="6"/>
+          <circle id="ring-arc" cx="48" cy="48" r="42" fill="none" stroke="#4fa391" stroke-width="6"
+                  stroke-linecap="round" stroke-dasharray="264" stroke-dashoffset="264"
+                  transform="rotate(-90 48 48)"/>
+          <text x="48" y="53" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="15" fill="#f1eee6" id="ring-pct">0%</text>
+        </svg>
+        <div class="copy">
+          <h3>This trip around the sun</h3>
+          <p>You're <span id="year-pct-text">–</span> of the way to your next birthday — <span id="days-to-bday">–</span> to go.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Built for the curious · calculates live in your browser</footer>
+</div>
+
+<script>
+const dobInput = document.getElementById('dob');
+const tobInput = document.getElementById('tob');
+const result = document.getElementById('result');
+const hint = document.getElementById('hint');
+let timer = null;
+
+function fmt(n){ return n.toLocaleString(); }
+
+function compute(){
+  if(!dobInput.value){
+    result.style.display = 'none';
+    hint.style.display = 'block';
+    hint.textContent = 'Enter your date of birth to begin.';
+    if(timer){ clearInterval(timer); timer = null; }
+    return;
+  }
+  const timeStr = tobInput.value || '00:00';
+  const birth = new Date(dobInput.value + 'T' + timeStr + ':00');
+  if(isNaN(birth.getTime())) return;
+
+  function update(){
+    const now = new Date();
+    if(birth > now){
+      result.style.display = 'none';
+      hint.style.display = 'block';
+      hint.textContent = "That date hasn't happened yet.";
+      return;
+    }
+    hint.style.display = 'none';
+    result.style.display = 'block';
+
+    let years = now.getFullYear() - birth.getFullYear();
+    let months = now.getMonth() - birth.getMonth();
+    let days = now.getDate() - birth.getDate();
+    if(days < 0){
+      months -= 1;
+      const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+      days += prevMonth.getDate();
+    }
+    if(months < 0){ years -= 1; months += 12; }
+
+    document.getElementById('out-years').textContent = years;
+    document.getElementById('out-months').textContent = months;
+    document.getElementById('out-days').textContent = days;
+
+    const diffMs = now - birth;
+    document.getElementById('out-totaldays').textContent = fmt(Math.floor(diffMs/86400000));
+    document.getElementById('out-totalsecs').textContent = fmt(Math.floor(diffMs/1000));
+
+    let lastBday = new Date(birth.getFullYear() + years, birth.getMonth(), birth.getDate());
+    let nextBday = new Date(lastBday);
+    nextBday.setFullYear(lastBday.getFullYear() + 1);
+    const yearLenMs = nextBday - lastBday;
+    const intoYearMs = now - lastBday;
+    const pct = Math.max(0, Math.min(1, intoYearMs / yearLenMs));
+    const circumference = 264;
+    const offset = circumference * (1 - pct);
+    document.getElementById('ring-arc').setAttribute('stroke-dashoffset', offset.toFixed(1));
+    document.getElementById('ring-pct').textContent = Math.round(pct*100) + '%';
+    document.getElementById('year-pct-text').textContent = Math.round(pct*100) + '%';
+
+    const daysToNext = Math.ceil((nextBday - now)/86400000);
+    document.getElementById('days-to-bday').textContent = daysToNext + (daysToNext === 1 ? ' day' : ' days');
+  }
+
+  update();
+  if(timer) clearInterval(timer);
+  timer = setInterval(update, 1000);
+}
+
+dobInput.addEventListener('change', compute);
+tobInput.addEventListener('change', compute);
+</script>
+</body>
+</html>
